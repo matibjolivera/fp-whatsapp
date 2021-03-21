@@ -1,0 +1,17 @@
+{
+  "name": "footprints-whatsapp",
+  "version": "1.0.0",
+  "description": "Whatsapp Sulla - Footprints",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matías Olivera",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.1",
+    "sulla": "^2.3.14",
+    "venom-bot": "^3.0.11"
+  }
+}
