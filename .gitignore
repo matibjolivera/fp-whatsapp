@@ -2,3 +2,4 @@
 tokens/
 session/
 node_modules/
+session.data.json
