@@ -18,7 +18,9 @@ async function sendMessages(client) {
             let phone = getPhone(billingClient);
             console.log("Contacto: " + phone + '@c.us');
 
-            await sendMessage(clientSender, phone, getMessage(billingClient, order.status, order.reference));
+            if (true === order.saved && false === sent) {
+                await sendMessage(clientSender, phone, getMessage(billingClient, order.status, order.reference), order.reference);
+            }
         }
         setTimeout(arguments.callee, 2000);
     })();
@@ -37,13 +39,22 @@ function getPhone(billingClient) {
     return phone;
 }
 
-async function sendMessage(clientSender, phone, message) {
+async function sendMessage(clientSender, phone, message, reference) {
     if ('541134160701' === phone) { //TODO: Delete if
         console.log("Message: " + message);
         await clientSender
             .sendText(phone + '@c.us', message)
             .then((result) => {
                 console.log('Result: ', result);
+                fetch(API_URL + reference, {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: {
+                        sent: true
+                    }
+                })
             })
             .catch((error) => {
                 console.error('Error when sending: ', error);
@@ -53,6 +64,14 @@ async function sendMessage(clientSender, phone, message) {
 
 function getMessage(billingClient, status, reference) {
     switch (status) {
+        case 'pending':
+            return '¡Hola, ' + billingClient.first_name + '!' +
+                '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pago del pedido número #' + reference + '. \n' +
+                'En caso de que hayas elegido para pagar por transferencia, envianos por acá el comprobante de pago. ' +
+                'En caso de pagar al retirar personalmente por nuestra oficina en Almagro (CABA) nos comunicaremos con vos para coordinar. ' +
+                'En caso de pagar con MercadoPago, ya te llegará un mensaje informando que recibimos el pago.\n' +
+                'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
+                'Saludos.';
         case 'processing':
             return '¡Hola, ' + billingClient.first_name + '!' +
                 '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pago del pedido número #' + reference + '. \n' +
@@ -74,6 +93,13 @@ function getMessage(billingClient, status, reference) {
                 'podrás ver el código de seguimiento en tu mail ( ' + billingClient.email + ')\n' +
                 'Recordá revisar en no deseados (spam) si no lo encontrás en tu bandeja de entrada!\n' +
                 'Si elegiste otro método de envío: desestimá este mensaje.\n' +
+                'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
+                'Saludos.';
+        case 'plazo-vencido':
+            return '¡Hola, ' + billingClient.first_name + '!\n ' +
+                '¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n' +
+                'Te queríamos recordar que tu pedido está pendiente de pago. En caso de que necesites que te resolvamos alguna duda o tengas algún ' +
+                'problema con el pago, te pedimos que nos consultes así te podemos asesorar.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
                 'Saludos.';
     }
