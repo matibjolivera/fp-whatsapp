@@ -64,6 +64,8 @@ async function sendMessage(clientSender, phone, message, reference) {
 
 function getMessage(billingClient, status, reference) {
     switch (status) {
+        case 'on-hold':
+        case 'pago-efectivo':
         case 'pending':
             return '¡Hola, ' + billingClient.first_name + '!' +
                 '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pago del pedido número #' + reference + '. \n' +
