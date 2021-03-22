@@ -18,11 +18,11 @@ async function sendMessages(client) {
             let phone = getPhone(billingClient);
             console.log("Contacto: " + phone + '@c.us');
 
-            if (true === order.saved && false === sent) {
+            if (true === order.saved && false === order.sent) {
                 await sendMessage(clientSender, phone, getMessage(billingClient, order.status, order.reference), order.reference);
             }
         }
-        setTimeout(arguments.callee, 2000);
+        setTimeout(arguments.callee, 60000);
     })();
 }
 
@@ -44,17 +44,18 @@ async function sendMessage(clientSender, phone, message, reference) {
         console.log("Message: " + message);
         await clientSender
             .sendText(phone + '@c.us', message)
-            .then((result) => {
+            .then(async function (result) {
                 console.log('Result: ', result);
-                fetch(API_URL + reference, {
-                    method: 'POST',
+                let response = await fetch(API_URL + reference, {
+                    method: 'PATCH',
                     headers: {
                         'content-type': 'application/json',
                     },
-                    body: {
+                    body: JSON.stringify({
                         sent: true
-                    }
+                    })
                 })
+                console.log(response);
             })
             .catch((error) => {
                 console.error('Error when sending: ', error);
@@ -63,6 +64,7 @@ async function sendMessage(clientSender, phone, message, reference) {
 }
 
 function getMessage(billingClient, status, reference) {
+    console.log("Get message - Status: " + status);
     switch (status) {
         case 'on-hold':
         case 'pago-efectivo':
@@ -88,7 +90,7 @@ function getMessage(billingClient, status, reference) {
                 'por motomensajería, confirmamos que el pedido ya está en tus manos.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
                 'Saludos.'
-        case 'etiqueta-impresa':
+        case 'etiq-impresa-ra':
             return '¡Hola, ' + billingClient.first_name + '!\n ' +
                 '¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n' +
                 'Si elegiste OCA como método de envío: la etiqueta para el envío a través de OCA a tu domicilio ya fue generada, ' +
