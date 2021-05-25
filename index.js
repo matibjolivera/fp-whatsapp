@@ -70,7 +70,7 @@ function getMessage(billingClient, status, reference) {
         case 'pago-efectivo':
         case 'pending':
             return '¡Hola, ' + billingClient.first_name + '!' +
-                '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pago del pedido número #' + reference + '. \n' +
+                '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pedido número #' + reference + '. \n' +
                 'En caso de que hayas elegido para pagar por transferencia, envianos por acá el comprobante de pago. ' +
                 'En caso de pagar al retirar personalmente por nuestra oficina en Almagro (CABA) nos comunicaremos con vos para coordinar. ' +
                 'En caso de pagar con MercadoPago, ya te llegará un mensaje informando que recibimos el pago.\n' +
@@ -82,6 +82,7 @@ function getMessage(billingClient, status, reference) {
                 'Si elegiste envío por OCA, te estaremos enviando el código de seguimiento.' +
                 'Si elegiste motomensajería o retiro personal por nuestra oficina en Almagro (CABA), nos comunicaremos con vos para ' +
                 'coordinar fecha y hora. \n' +
+                'Si ya retiraste y abonaste en nuestra oficina en Almagro (CABA) desestima este mensaje. \n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá. Saludos.';
         case 'completed':
             return '¡Hola, ' + billingClient.first_name + '!\n ' +
