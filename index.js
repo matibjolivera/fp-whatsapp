@@ -40,7 +40,6 @@ function getPhone(billingClient) {
 }
 
 async function sendMessage(clientSender, phone, message, reference) {
-    if ('541134160701' === phone) { //TODO: Delete if
         console.log("Message: " + message);
         await clientSender
             .sendText(phone + '@c.us', message)
@@ -60,7 +59,6 @@ async function sendMessage(clientSender, phone, message, reference) {
             .catch((error) => {
                 console.error('Error when sending: ', error);
             });
-    }
 }
 
 function getMessage(billingClient, status, reference) {
@@ -71,15 +69,15 @@ function getMessage(billingClient, status, reference) {
         case 'pending':
             return '¡Hola, ' + billingClient.first_name + '!' +
                 '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pedido número #' + reference + '. \n' +
-                'En caso de que hayas elegido para pagar por transferencia, envianos por acá el comprobante de pago. ' +
-                'En caso de pagar al retirar personalmente por nuestra oficina en Almagro (CABA) nos comunicaremos con vos para coordinar. ' +
+                'En caso de que hayas elegido para pagar por transferencia, envianos por acá el comprobante de pago. ' + ' \n' +
+                'En caso de pagar al retirar personalmente por nuestra oficina en Almagro (CABA) nos comunicaremos con vos para coordinar.  \n' +
                 'En caso de pagar con MercadoPago, ya te llegará un mensaje informando que recibimos el pago.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
                 'Saludos.';
         case 'processing':
             return '¡Hola, ' + billingClient.first_name + '!' +
                 '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pago del pedido número #' + reference + '. \n' +
-                'Si elegiste envío por OCA, te estaremos enviando el código de seguimiento.' +
+                'Si elegiste envío por OCA, te estaremos enviando el código de seguimiento.' + ' \n' +
                 'Si elegiste motomensajería o retiro personal por nuestra oficina en Almagro (CABA), nos comunicaremos con vos para ' +
                 'coordinar fecha y hora. \n' +
                 'Si ya retiraste y abonaste en nuestra oficina en Almagro (CABA) desestima este mensaje. \n' +
