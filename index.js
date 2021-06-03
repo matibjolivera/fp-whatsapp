@@ -15,7 +15,7 @@ async function sendMessages(client) {
         let orders = await getOrders();
         for (let order of orders.result) {
             try {
-            let billingClient = order.billing;
+                let billingClient = order.billing;
                 let phone = getPhone(billingClient);
                 console.log("Contacto: " + phone + '@c.us');
 
