@@ -14,12 +14,16 @@ async function sendMessages(client) {
     await (async function () {
         let orders = await getOrders();
         for (let order of orders.result) {
+            try {
             let billingClient = order.billing;
-            let phone = getPhone(billingClient);
-            console.log("Contacto: " + phone + '@c.us');
+                let phone = getPhone(billingClient);
+                console.log("Contacto: " + phone + '@c.us');
 
-            if (true === order.saved && false === order.sent) {
-                await sendMessage(clientSender, phone, getMessage(billingClient, order.status, order.reference), order.reference);
+                if (true === order.saved && false === order.sent) {
+                    await sendMessage(clientSender, phone, getMessage(billingClient, order.status, order.reference), order.reference);
+                }
+            } catch (e) {
+                console.log("Error al enviar mensaje: " + e)
             }
         }
         setTimeout(arguments.callee, 60000);
