@@ -2,6 +2,16 @@ const venom = require('venom-bot');
 const fetch = require("node-fetch");
 const API_URL = 'https://fp-woocommerce.herokuapp.com/orders/';
 
+const enabledStatuses = [
+    'on-hold',
+    'pago-efectivo',
+    'pending',
+    'processing',
+    'completed',
+    'etiq-impresa',
+    'plazo-vencido'
+]
+
 venom
     .create()
     .then((client) => sendMessages(client))
@@ -11,6 +21,17 @@ venom
 
 async function sendMessages(client) {
     const clientSender = client;
+
+    process.on('SIGINT', function () {
+        client.close();
+    });
+
+    try {
+
+    } catch (error) {
+        client.close();
+    }
+
     await (async function () {
         let orders = await getOrders();
         for (let order of orders.result) {
@@ -19,7 +40,7 @@ async function sendMessages(client) {
                 let phone = getPhone(billingClient);
                 console.log("Contacto: " + phone + '@c.us');
 
-                if (true === order.saved && false === order.sent) {
+                if (true === order.saved && false === order.sent && enabledStatuses.includes(order.status)) {
                     await sendMessage(clientSender, phone, getMessage(billingClient, order.status, order.reference), order.reference);
                 }
             } catch (e) {
@@ -31,8 +52,13 @@ async function sendMessages(client) {
 }
 
 async function getOrders() {
-    let response = await fetch(API_URL);
-    return await response.json();
+    try {
+        let response = await fetch(API_URL);
+        return await response.json();
+    } catch (e) {
+        setTimeout(arguments.callee, 60000);
+        await getOrders();
+    }
 }
 
 function getPhone(billingClient) {
