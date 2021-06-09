@@ -1,4 +1,4 @@
-const venom = require('venom-bot');
+﻿const venom = require('venom-bot');
 const fetch = require("node-fetch");
 const API_URL = 'https://fp-woocommerce.herokuapp.com/orders/';
 
@@ -119,7 +119,7 @@ function getMessage(billingClient, status, reference) {
                 'por motomensajería, confirmamos que el pedido ya está en tus manos.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
                 'Saludos.'
-        case 'etiq-impresa':
+        case 'etiqueta-impresa':
             return '¡Hola, ' + billingClient.first_name + '!\n ' +
                 '¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n' +
                 'Si elegiste OCA como método de envío: la etiqueta para el envío a través de OCA a tu domicilio ya fue generada, ' +
