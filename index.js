@@ -8,7 +8,7 @@ const enabledStatuses = [
     'pending',
     'processing',
     'completed',
-    'etiq-impresa',
+    'etiqueta-impresa',
     'plazo-vencido'
 ]
 
