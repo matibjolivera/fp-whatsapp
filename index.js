@@ -38,8 +38,6 @@ async function sendMessages(client) {
             try {
                 let billingClient = order.billing;
                 let phone = getPhone(billingClient);
-                console.log("Contacto: " + phone + '@c.us');
-
                 if (true === order.saved && false === order.sent && enabledStatuses.includes(order.status)) {
                     await sendMessage(clientSender, phone, getMessage(billingClient, order.status, order.reference), order.reference);
                 }
@@ -70,11 +68,10 @@ function getPhone(billingClient) {
 }
 
 async function sendMessage(clientSender, phone, message, reference) {
-        console.log("Message: " + message);
         await clientSender
             .sendText(phone + '@c.us', message)
             .then(async function (result) {
-                console.log('Result: ', result);
+                console.log('Mensaje enviado correctamente a: ' + phone + ' - Reference: ' + reference);
                 let response = await fetch(API_URL + reference, {
                     method: 'PATCH',
                     headers: {
@@ -87,12 +84,11 @@ async function sendMessage(clientSender, phone, message, reference) {
                 console.log(response);
             })
             .catch((error) => {
-                console.error('Error when sending: ', error);
+                console.error('Error al intentar enviar a: ' + error.to + ' - no se pudo por: ' + error.text);
             });
 }
 
 function getMessage(billingClient, status, reference) {
-    console.log("Get message - Status: " + status);
     switch (status) {
         case 'on-hold':
         case 'pago-efectivo':
