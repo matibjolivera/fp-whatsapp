@@ -41,7 +41,7 @@ async function sendMessages(client) {
                 let billingClient = order.billing;
                 let phone = getPhone(billingClient);
                 if (true === order.saved && false === order.sent && enabledStatuses.includes(order.status)) {
-                    await sendMessage(clientSender, phone, getMessage(billingClient, order.status, order.reference), order.reference);
+                    await sendMessage(clientSender, phone, getMessage(billingClient, order), order.reference);
                 }
             } catch (e) {
                 console.log("Error al enviar mensaje: " + e)
@@ -70,54 +70,64 @@ function getPhone(billingClient) {
 }
 
 async function sendMessage(clientSender, phone, message, reference) {
-    await clientSender
-        .sendText(phone + '@c.us', message)
-        .then(async function (result) {
-            console.log('Mensaje enviado correctamente a: ' + phone + ' - Reference: ' + reference);
-            let response = await fetch(API_URL + reference, {
-                method: 'PATCH',
-                headers: {
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify({
-                    sent: true
+    if (message) {
+        await clientSender
+            .sendText(phone + '@c.us', message)
+            .then(async function (result) {
+                console.log('Mensaje enviado correctamente a: ' + phone + ' - Reference: ' + reference);
+                let response = await fetch(API_URL + reference, {
+                    method: 'PATCH',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sent: true
+                    })
                 })
             })
-        })
-        .catch((error) => {
-            console.error('Error al intentar enviar a: ' + error.to + ' - no se pudo por: ' + error.text);
-        });
+            .catch((error) => {
+                console.error('Error al intentar enviar a: ' + error.to + ' - no se pudo por: ' + error.text);
+            });
+    }
 }
 
-function getMessage(billingClient, status, reference) {
-    switch (status) {
+const ID_SHIPPING_TO_COORDINATE = 33;
+
+function getMessage(billingClient, order) {
+    let msg = null;
+    const reference = order.reference
+    switch (order.status) {
         case 'on-hold':
         case 'pending':
-            return '¡Hola, ' + billingClient.first_name + '!' +
+            msg = '¡Hola, ' + billingClient.first_name + '!' +
                 '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pedido número #' + reference + '. \n' +
                 'En caso de que hayas elegido para pagar por transferencia, envianos por acá el comprobante de pago. ' + ' \n' +
                 'En caso de pagar con MercadoPago, ya te llegará un mensaje informando que recibimos el pago.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
                 'Saludos.';
+            break
         case 'pago-efectivo':
-            return '¡Hola, ' + billingClient.first_name + '! \n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pedido número #' + reference + '. \n' + 'Te pedimos que por favor envíes un Whatsapp al siguiente contacto, indicando tu número de pedido (' + reference + '), para coordinar el retiro personal del pedido: ' + COORDINATOR_NUMBER
+            msg = '¡Hola, ' + billingClient.first_name + '! \n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pedido número #' + reference + '. \n' + 'Te pedimos que por favor envíes un Whatsapp al siguiente contacto, indicando tu número de pedido (' + reference + '), para coordinar el retiro personal del pedido: ' + COORDINATOR_NUMBER
+            break
         case 'processing':
-            return '¡Hola, ' + billingClient.first_name + '!' +
+            msg = '¡Hola, ' + billingClient.first_name + '!' +
                 '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pago del pedido número #' + reference + '. \n' +
                 'Si elegiste envío por OCA, te estaremos enviando el código de seguimiento.' + ' \n' +
                 'Si elegiste motomensajería o retiro personal por nuestra oficina en Almagro (CABA), nos comunicaremos con vos para ' +
                 'coordinar fecha y hora. \n' +
                 'Si ya retiraste y abonaste en nuestra oficina en Almagro (CABA) desestima este mensaje. \n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá. Saludos.';
+            break
         case 'completed':
-            return '¡Hola, ' + billingClient.first_name + '!\n ' +
+            msg = '¡Hola, ' + billingClient.first_name + '!\n ' +
                 '¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n' +
                 'En caso de que hayas seleccionado envío por OCA, tu pedido ya fue despachado. En caso de haber retirado personalmente o recibido ' +
                 'por motomensajería, confirmamos que el pedido ya está en tus manos.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
                 'Saludos.'
+            break
         case 'etiqueta-impresa':
-            return '¡Hola, ' + billingClient.first_name + '!\n ' +
+            msg = '¡Hola, ' + billingClient.first_name + '!\n ' +
                 '¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n' +
                 'Si elegiste OCA como método de envío: la etiqueta para el envío a través de OCA a tu domicilio ya fue generada, ' +
                 'podrás ver el código de seguimiento en tu mail ( ' + billingClient.email + ')\n' +
@@ -125,12 +135,18 @@ function getMessage(billingClient, status, reference) {
                 'Si elegiste otro método de envío: desestimá este mensaje.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
                 'Saludos.';
+            break
         case 'plazo-vencido':
-            return '¡Hola, ' + billingClient.first_name + '!\n ' +
+            msg = '¡Hola, ' + billingClient.first_name + '!\n ' +
                 '¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n' +
                 'Te queríamos recordar que tu pedido está pendiente de pago. En caso de que necesites que te resolvamos alguna duda o tengas algún ' +
                 'problema con el pago, te pedimos que nos consultes así te podemos asesorar.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
-                'Saludos.';
+                'Saludos.'
+            break
     }
+    if (msg && 'shipping_method_id' in order && order.shipping_method_id === ID_SHIPPING_TO_COORDINATE) {
+        msg += '\nENVÍO CONTRAREEMBOLSO ¡IMPORTANTE! Te pedimos que por favor envíes un Whatsapp al siguiente contacto, indicando tu número de pedido (' + reference + '), para coordinar el envío del pedido: ' + COORDINATOR_NUMBER
+    }
+    return msg
 }
