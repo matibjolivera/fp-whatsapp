@@ -127,14 +127,11 @@ function getMessage(billingClient, order) {
                 'Saludos.'
             break
         case 'etiqueta-impresa':
-            msg = '¡Hola, ' + billingClient.first_name + '!\n ' +
-                '¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n' +
-                'Si elegiste OCA como método de envío: la etiqueta para el envío a través de OCA a tu domicilio ya fue generada, ' +
-                'podrás ver el código de seguimiento en tu mail ( ' + billingClient.email + ')\n' +
-                'Recordá revisar en no deseados (spam) si no lo encontrás en tu bandeja de entrada!\n' +
-                'Si elegiste otro método de envío: desestimá este mensaje.\n' +
-                'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
-                'Saludos.';
+            if (order.shipping_number) {
+                msg = '¡Hola, ' + billingClient.first_name + '!\n¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n'
+                msg += 'La etiqueta de envío por OCA ya fue generada. Tu código de seguimiento es ' + order.shipping_number + '\n Podés visitar el estado del pedido en: www.oca.com.ar/envios/paquetes/' + order.shipping_number
+                msg += 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\nSaludos.';
+            }
             break
         case 'plazo-vencido':
             msg = '¡Hola, ' + billingClient.first_name + '!\n ' +
