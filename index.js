@@ -130,7 +130,7 @@ function getMessage(billingClient, order) {
             if (order.shipping_number) {
                 msg = '¡Hola, ' + billingClient.first_name + '!\n¿Cómo estás? Nos comunicamos de Footprints Clothes, con respecto a tu pedido #' + reference + '. \n'
                 msg += 'La etiqueta de envío por OCA ya fue generada. Tu código de seguimiento es ' + order.shipping_number + '\n Podés visitar el estado del pedido en: www.oca.com.ar/envios/paquetes/' + order.shipping_number
-                msg += 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\nSaludos.';
+                msg += ' \nTe agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\nSaludos.';
             }
             break
         case 'plazo-vencido':
