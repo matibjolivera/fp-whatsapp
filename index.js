@@ -146,7 +146,7 @@ function getMessage(billingClient, order) {
             break
     }
     if (msg && 'shipping_method_id' in order && order.shipping_method_id === ID_SHIPPING_TO_COORDINATE) {
-        msg += '\nENVÍO CONTRAREEMBOLSO ¡IMPORTANTE! Te pedimos que por favor envíes un Whatsapp al siguiente contacto, indicando tu número de pedido (' + reference + '), para coordinar el envío del pedido: ' + COORDINATOR_NUMBER
+        msg += '\nENVÍO MOTOMENSAJERÍA CABA: Te pedimos que por favor envíes un Whatsapp al siguiente contacto, indicando tu número de pedido (' + reference + '), para coordinar el envío del pedido: ' + COORDINATOR_NUMBER
     }
     return msg
 }
