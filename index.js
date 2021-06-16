@@ -12,6 +12,8 @@ const enabledStatuses = [
     'plazo-vencido'
 ]
 
+const COORDINATOR_NUMBER = '+54 9 11-3623-9096'
+
 venom
     .create()
     .then((client) => sendMessages(client))
@@ -68,38 +70,37 @@ function getPhone(billingClient) {
 }
 
 async function sendMessage(clientSender, phone, message, reference) {
-        await clientSender
-            .sendText(phone + '@c.us', message)
-            .then(async function (result) {
-                console.log('Mensaje enviado correctamente a: ' + phone + ' - Reference: ' + reference);
-                let response = await fetch(API_URL + reference, {
-                    method: 'PATCH',
-                    headers: {
-                        'content-type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sent: true
-                    })
+    await clientSender
+        .sendText(phone + '@c.us', message)
+        .then(async function (result) {
+            console.log('Mensaje enviado correctamente a: ' + phone + ' - Reference: ' + reference);
+            let response = await fetch(API_URL + reference, {
+                method: 'PATCH',
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sent: true
                 })
-                console.log(response);
             })
-            .catch((error) => {
-                console.error('Error al intentar enviar a: ' + error.to + ' - no se pudo por: ' + error.text);
-            });
+        })
+        .catch((error) => {
+            console.error('Error al intentar enviar a: ' + error.to + ' - no se pudo por: ' + error.text);
+        });
 }
 
 function getMessage(billingClient, status, reference) {
     switch (status) {
         case 'on-hold':
-        case 'pago-efectivo':
         case 'pending':
             return '¡Hola, ' + billingClient.first_name + '!' +
                 '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pedido número #' + reference + '. \n' +
                 'En caso de que hayas elegido para pagar por transferencia, envianos por acá el comprobante de pago. ' + ' \n' +
-                'En caso de pagar al retirar personalmente por nuestra oficina en Almagro (CABA) nos comunicaremos con vos para coordinar.  \n' +
                 'En caso de pagar con MercadoPago, ya te llegará un mensaje informando que recibimos el pago.\n' +
                 'Te agradecemos y cualquier consulta que tengas nos la podés hacer por acá.\n' +
                 'Saludos.';
+        case 'pago-efectivo':
+            return '¡Hola, ' + billingClient.first_name + '! \n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pedido número #' + reference + '. \n' + 'Te pedimos que por favor envíes un Whatsapp al siguiente contacto, indicando tu número de pedido (' + reference + '), para coordinar el retiro personal del pedido: ' + COORDINATOR_NUMBER
         case 'processing':
             return '¡Hola, ' + billingClient.first_name + '!' +
                 '\n ¿Cómo estás? Nos comunicamos de Footprints Clothes, nos llegó tu pago del pedido número #' + reference + '. \n' +
